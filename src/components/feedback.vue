@@ -1,5 +1,9 @@
 <template>
     <div class="app_feedback">
+        <div class="feedback">
+            <goback class="go"></goback>
+            <div class="feedback_name">反馈中心</div>
+        </div>
         <div class='feedback_box'>
             <div class='feedback_box_container'>
                 <div class="helper"></div>
@@ -18,11 +22,11 @@
 import alert from './alert.vue';
 import musicControl from './musicControl.vue';
 import api from '../api/Api.js';
-import exit from '../api/exit.js'
+import goback from './goback.vue';
 export default {
     name:'feedback',
     components: { 
-        alert,musicControl
+        alert,musicControl,goback
     },
     data() {
         return {
@@ -50,7 +54,6 @@ export default {
         submit:function(e){
            this.show=true;
            var text = this.contentMsg.trim();
-        //    console.log(text)
            var that = this;
            let params = {
                 token:localStorage.getItem('token'),
@@ -72,7 +75,6 @@ export default {
                     if(res.success == 400){
                         that.show = true;
                         that.alertMsg = res.message
-                        exit();
                     }
                })
            }
@@ -81,6 +83,9 @@ export default {
             this.show = false;
             if(this.alertMsg == '留言成功！'){
                 this.$router.push('/my')
+            }else if(this.alertMsg == '登录已失效，请重新登录'){
+                localStorage.clear();
+                this.$router.push('/login');
             }
         }
     },
@@ -90,12 +95,53 @@ export default {
 @import '../../static/assets/iconfont/font.css';
 .app_feedback{
     width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  overflow: auto;
-  position: relative;
-  z-index: 99;
-  background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+    position: relative;
+    z-index: 99;
+    background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
+   .feedback{
+        width: 100%;
+        display: flex;
+        padding-top: 8px;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 20px;
+        .go{
+            position: absolute;
+        }
+        .feedback_name{
+            color: #A41522;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            margin: 0 auto;
+            &::before,&::after{
+                background: url("../../static/assets/images/poem.png");
+            }
+            &::before{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                left: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                right: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                transform: scale(-1, 1);
+            }
+        }
+    }
   .feedback_box{
     width: 100%;
     height: 100%;
@@ -113,7 +159,7 @@ export default {
         border: 1px solid #A41522;
         position: relative;
         box-sizing: border-box;
-        padding: 25px 16px;
+        padding: 20px 15px;
         textarea{
             width: 100%;
             height: 100%;

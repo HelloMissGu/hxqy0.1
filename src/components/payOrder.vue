@@ -1,50 +1,126 @@
 <template>
     <div class="app_myDonate">
         <div class="myDonate_bar">
+            <goback class="go"></goback>
             <div class="myDonate_name">我的订单</div>
         </div>
-        <!-- <div class="empty_order">
+        <div class="empty_order" v-if="count == 0">
             <span class="iconfont icon-kong"></span>
             <span>—— 暂无订单 ——</span>
-        </div> -->
-        <div class="order_item">
+        </div>
+        <div class="order_item" v-for="(order,key) in orderList" :key="key" v-else>
             <div class="helper"></div>
             <div class="order_item_content">
                 <div class="status_bar">
                     <div class="data_activity">
                         <span class="iconfont icon-simiao"></span>
-                        <span class="activity_name">测试寺庙</span>
+                        <span class="activity_name" style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">
+                            {{order.title}}
+                        </span>
                         <span class="iconfont icon-myIcon_right"></span>
                     </div>
                     <span class="activity_status">订单已完成</span>
                 </div>
                 <div class="goods_info">
-                    <img src="../../static/assets/images/logo.png" alt="">
+                    <img :src="order.img_url" alt="">
                     <div class="goods_order_info">
                         <div class="info1">
-                            <span class="goods_name">测试寺庙 X 20 份</span>
-                            <span class="goods_unit">2 元 / 份</span>
+                            <span class="goods_name">{{order.number}} 份</span>
+                            <span class="goods_unit">{{order.unit_price}} 元 / 份</span>
                         </div>
-                        <div class="info2">合计：<span>￥40</span></div>
+                        <div class="info2">合计：<span>￥{{order.price}}</span></div>
                     </div>
                 </div>
                 <div class="btns">
-                    <button class="go_detail" @click="toDonateDetail">查看详情</button>
+                    <div>
+                        <span class="iconfont icon-13"></span>
+                        <span class="create_date">{{order.create_time}}</span>
+                    </div>
+                    <router-link :to="{path:'/donateDetail',query:{id:order.id}}">
+                        <button class="go_detail">查看详情</button>
+                    </router-link>
                 </div>
             </div>
         </div>
+        <span class="load_more" v-if="page < Math.ceil(count/10)" @click="loadMore(page)">点击加载更多</span>
+        <span class="load_more"  v-else>没有更多了</span>
+        <alert v-if="show" :message="alertMsg" @close-alert="closeAlert"></alert>
         <musicControl></musicControl>
     </div>
 </template>
 <script>
 import musicControl from './musicControl.vue';
+import api from '../api/Api.js';
+import alert from './alert.vue'
+import goback from './goback.vue'
 export default {
+    data() {
+        return {
+            count:'',
+            page:'',
+            orderList:[],
+            show:false,
+            alertMsg:''
+        }
+    },
     components: { 
-        musicControl
+        musicControl,alert,goback
+    },
+    beforeMount(){
+        var that = this;
+        let params = {
+            token:localStorage.getItem('token'),
+            pageSize:1
+        }
+        api('/interface.php/V1/User/myOrder',params)
+        .then(res => {
+             if(res.success == 200){
+                that.count = res.data.count
+                that.page = res.data.page
+                that.orderList = res.data.data
+            }
+            if(res.success == 300){
+                that.show = true;
+                that.alertMsg =  res.message
+            }
+            if(res.success == 400){
+                that.show = true;
+                that.alertMsg = res.message
+            }
+        })
     },
     methods: {
-        toDonateDetail(){
-            this.$router.push('/donateDetail')
+        loadMore(page){
+            var orderId = parseInt(this.id)
+            var that = this;
+            var page = Number(page) + Number(1);
+            let params = {
+                token:localStorage.getItem('token'),
+                pageSize:page
+            }
+            api('/interface.php/V1/User/myOrder',params)
+            .then(res => {
+                if(res.success == 200){
+                    that.count = res.data.count
+                    that.page = res.data.page
+                    that.orderList.push.apply(that.orderList,res.data.data)
+                }
+                 if(res.success == 300){
+                    that.show = true;
+                    that.alertMsg = res.message
+                }
+                if(res.success == 400){
+                    that.show = true;
+                    that.alertMsg = res.message
+                }
+            })
+        },
+        closeAlert(){
+            this.show = false;
+            if(this.alertMsg == '登录已失效，请重新登录'){
+                localStorage.clear();
+                this.$router.push('/login');
+            }
         }
     },
 }
@@ -60,41 +136,40 @@ export default {
         z-index: 100;
         background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
         .myDonate_bar{
-            width: 100px;
-            height: 30px;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            margin: 0 auto;
-            margin-top: 16px;
+            padding-top: 8px;
             box-sizing: border-box;
+            position: relative;
+            .go{
+                position: absolute;
+            }
             .myDonate_name{
-                color: #382F30;
+                color: #A41522;
                 font-size: 16px;
                 font-weight: bold;
                 position: relative;
-                text-align: center;
-                display: inline-block;
-                margin: 0 auto 8px auto;
+                margin: 0 auto;
                 &::before,&::after{
-                    background: url("../../static/assets/images/cloud.png") no-repeat no-repeat;
+                    background: url("../../static/assets/images/poem.png");
                 }
                 &::before{
                     content: '';
                     position: absolute;
-                    width: 32px;
-                    height: 14px;
-                    left: -40px;
-                    top: 4px;
-                    background-size: 32px 14px;
+                    width: 55px;
+                    height: 19px;
+                    left: -60px;
+                    top: 0px;
+                    background-size: 55px 19px;
                 }
                 &::after{
                     content: '';
                     position: absolute;
-                    width: 32px;
-                    height: 14px;
-                    right: -40px;
-                    top: 4px;
-                    background-size: 32px 14px;
+                    width: 55px;
+                    height: 19px;
+                    right: -60px;
+                    top: 0px;
+                    background-size: 55px 19px;
                     transform: scale(-1, 1);
                 }
             }
@@ -111,8 +186,8 @@ export default {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            .inconfont{
-                font-size: 32px;
+            .iconfont{
+                font-size: 34px;
                 margin-bottom: 16px;
             }
         }
@@ -165,10 +240,16 @@ export default {
             justify-content: space-between;
             color: #8B623E;
             font-size: 14px;
-            span{
-                 margin-right: 12px; 
+            .data_activity{
+                display: flex;
+                flex: 0.75;
+                align-items: center;
+                span{
+                    margin-right: 12px; 
+                }
             }
             .activity_status{
+                flex: 0.25;
                 color: #A41522;
             }
         }
@@ -218,8 +299,19 @@ export default {
         }
         .btns{
             display: flex;
-            justify-content: flex-end;
             margin-top: 10px;
+            justify-content: space-between;
+            align-items: center;
+            .icon-13{
+                color: #8B623E;
+                font-size: 22px;
+                vertical-align: middle; 
+            }
+            .create_date{
+                color: #8B623E;
+                font-size: 15px;
+                vertical-align: middle; 
+            }
             button{
                 margin: 0;
                 margin-left: 16px;
@@ -227,7 +319,7 @@ export default {
                 font-size: 14px;
                 width: 90px;
                 height: 30px;
-                line-height: 30px;
+                line-height: 27px;
                 border-radius: 6px;
                 border: 1px solid #8B623E;
                 background: none;
@@ -239,6 +331,14 @@ export default {
                 color: #A41522;
                 border-color: #A41522;
             }
+        }
+        .load_more{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #8B623E;
+            margin-bottom: 15px;
         }
     }
 </style>

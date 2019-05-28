@@ -34,7 +34,6 @@
 <script>
 import musicControl from './musicControl.vue';
 import api from '../api/Api.js';
-import exit from '../api/exit.js'
 import alert from './alert.vue'
 export default {
     components:{musicControl,alert},
@@ -62,14 +61,24 @@ export default {
             if(res.success == 400){
                 that.show = true;
                 that.alertMsg = res.message
-                exit();
             }
         })
     },
+     beforeUpdate(){
+            // console.log(this.$route.path)
+            // console.log('donate')
+            // if(this.$route.path == '/home'){
+
+            // }
+        },
     methods: {
        closeAlert(){
         this.show = false;
-       }
+        if(this.alertMsg == '登录已失效，请重新登录'){
+           localStorage.clear();
+            this.$router.push('/login');
+        }
+       },
     },
 }
 </script>
@@ -173,7 +182,7 @@ export default {
                     -webkit-box-orient: vertical;
                     -webkit-line-clamp: 1;
                     line-height: 16px;
-                    max-height: 16px;
+                    height: 15px;
                 }
                 .donate_date{ 
                     display: flex;

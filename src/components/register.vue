@@ -28,7 +28,6 @@
 import api from '../api/Api.js';
 import alert from './alert.vue';
 import { mapMutations } from 'vuex';
-import exit from '../api/exit.js';
 export default {
   name: 'register',
    components: { 
@@ -90,14 +89,16 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
         })
     },
     closeAlert(){
         this.show = false;
-        if(this.alertMsg = '注册成功！'){
+        if(this.alertMsg == '注册成功！'){
             this.$router.push('/home');
+        }else if(this.alertMsg == '登录已失效，请重新登录'){
+            localStorage.clear();
+            this.$router.push('/login');
         }
     }
   },
@@ -226,6 +227,7 @@ export default {
                 border-bottom: 1px solid rgba(139, 98, 62, .6);
                 z-index: 2;
                 input{
+                    width: 80%;
                     outline-style: none;
                     border: none;
                     background-color: #e9dbbe;

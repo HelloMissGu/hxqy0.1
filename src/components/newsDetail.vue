@@ -1,5 +1,9 @@
 <template>
     <div class="app_newsDetail">
+        <div class="newsDetail_box">
+            <goback class="go"></goback>
+            <div class="newsDetail_name">法讯详情</div>
+        </div>
         <img class="title_img" :src='cover' alt="">
         <div class="newsDetail_content" >
             <span class="title">{{title}}</span>
@@ -15,10 +19,10 @@
 import api from '../api/Api.js';
 import musicControl from './musicControl.vue';
 import alert from './alert.vue';
-import exit from '../api/exit.js'
+import goback from './goback.vue';
 export default {
     name:'newsDetail',
-    components:{musicControl},
+    components:{musicControl,alert,goback},
     data() {
         return {
             id:this.$route.query.id,
@@ -50,9 +54,17 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
            })
+    },
+    methods: {
+        closeAlert(){
+            this.show = false;
+            if(this.alertMsg == '登录已失效，请重新登录'){
+                localStorage.clear();
+                this.$router.push('/login');
+            }
+        }
     },
 }
 </script>
@@ -66,6 +78,46 @@ export default {
   position: relative;
   z-index: 99;
   background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
+  .newsDetail_box{
+        width: 100%;
+        display: flex;
+        padding-top: 8px;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 20px;
+        .go{
+            position: absolute;
+        }
+        .newsDetail_name{
+            color: #A41522;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            margin: 0 auto;
+            &::before,&::after{
+                background: url("../../static/assets/images/poem.png");
+            }
+            &::before{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                left: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                right: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                transform: scale(-1, 1);
+            }
+        }
+    }
     span{
         display: block;
     }

@@ -1,7 +1,8 @@
 <template>
     <div class="app_changePass">
     <div class="changePass_box">
-      <div class="changePass_name">修改密码</div>
+       <goback class="go"></goback>
+       <div class="changePass_name">修改密码</div>
     </div>
     <div class="my_changePass" novalidate="true">
       <div class="changePass_list">
@@ -27,12 +28,12 @@
 <script>
 import alert from './alert.vue';
 import api from '../api/Api.js';
+import goback from './goback.vue';
 import musicControl from './musicControl.vue';
-import exit from '../api/exit.js'
 export default {
     name: 'changePass',
      components: { 
-           alert,musicControl
+           alert,musicControl,goback
     },
   data () {
         return {
@@ -74,7 +75,6 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
             })
             .catch(res =>{
@@ -82,8 +82,11 @@ export default {
       },
     closeAlert(){
         this.show = false;
-        if(this.alertMsg = '修改成功！'){
+        if(this.alertMsg == '修改成功！'){
             this.$router.push('/my')
+        }else if(this.alertMsg == '登录已失效，请重新登录'){
+            localStorage.clear();
+            this.$router.push('/login');
         }
     }
   },
@@ -99,22 +102,20 @@ export default {
     z-index: 100;
     background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;  
     .changePass_box{
-        width: 100px;
-        // height: 30px;
+        width: 100%;
         display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-        padding-top: 30px;
+        padding-top: 8px;
         box-sizing: border-box;
+        position: relative;
+        .go{
+            position: absolute;
+        }
         .changePass_name{
-            // color: #382F30;
             color: #A41522;
             font-size: 16px;
             font-weight: bold;
             position: relative;
-            text-align: center;
-            display: inline-block;
-            margin: 0 auto 8px auto;
+            margin: 0 auto;
             &::before,&::after{
                 background: url("../../static/assets/images/poem.png");
             }
@@ -126,6 +127,7 @@ export default {
                 left: -60px;
                 top: 0px;
                 background-size: 55px 19px;
+                
             }
             &::after{
                 content: '';
@@ -152,7 +154,6 @@ export default {
             width: 100%;
             border: 1px solid #8B623E;
             position: relative;
-            // box-sizing: border-box;
             padding: 25px 15px;
             &::before,&::after,.helper::before,.helper::after{
                 background: url("../../static/assets/images/border.png");

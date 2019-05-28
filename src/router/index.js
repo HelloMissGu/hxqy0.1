@@ -17,6 +17,7 @@ import confirm from '@/components/confirm.vue'
 import pay from '@/components/pay.vue'
 import payOrder from '@/components/payOrder.vue'
 import payConfirm from '@/components/payConfirm.vue'
+// import navbar from '@/components/navbar.vue'
 
 Vue.use(Router)
 // if(localStorage.getItem('token')){
@@ -125,10 +126,11 @@ const router = new Router({
       component: payConfirm
     },
   ]
+  
 });
 
 router.beforeEach((to,from,next) => {
-  if(to.path === '/login' ||to.path === '/register'){
+  if(to.path === '/login' || to.path === '/register'){
     next();
   }else{
     let token = localStorage.getItem('token');
@@ -138,12 +140,10 @@ router.beforeEach((to,from,next) => {
       next();
     }
   }
-  // if(to.path !== '/login'){
-  //   if(!localStorage.getItem('token')){
-  //     this.$router.push('/login');
-  //   }
-  // }
 });
 
+// if(this.$route.path === '/home'){
+
+// }
 export default router;
 

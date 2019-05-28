@@ -15,8 +15,7 @@
                         <span class="news_title">{{item.title}}</span>
                         <div class="news_date">
                             <div>
-                            <span class="iconfont icon-13"></span>
-                            <span class="created_date">发布时间{{item.create_time}}</span>
+                            <span class="iconfont icon-13"></span><span class="created_date">发布时间{{item.create_time}}</span>
                             </div>
                             <span class="iconfont icon-myIcon_right"></span>
                         </div>
@@ -34,10 +33,9 @@
 <script>
 import musicControl from './musicControl.vue';
 import api from '../api/Api.js';
-import exit from '../api/exit.js';
 import alert from './alert.vue';
 export default {
-    components:{musicControl},
+    components:{musicControl,alert},
     data(){
         return{
             page:'',
@@ -67,10 +65,16 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
             })
     },
+     beforeUpdate(){
+            // console.log(this.$route.path)
+            // console.log('news')
+            // if(this.$route.path == '/home'){
+
+            // }
+        },
     methods: {
         loadMore(page){
             // console.log(page)
@@ -94,10 +98,16 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
-               })
+            })
         },
+        closeAlert(){
+            this.show = false;
+            if(this.alertMsg == '登录已失效，请重新登录'){
+                 localStorage.clear();
+                this.$router.push('/login');
+            }
+        }
     },
 }
 </script>
@@ -178,14 +188,14 @@ export default {
             border-radius: 6px;
             display: flex;
             img{
-                flex: 0 0 150px;
+                width: 42%;
                 height: 100px;
                 border-top-left-radius: 6px;
                 border-bottom-left-radius: 6px;
             }
             .news_info{
+                width: 50%;
                 height: 100%;
-                width: calc(100% - 150px);
                 padding: 6px 10px 6px 10px;
                 box-sizing: border-box;
                 display: flex;
@@ -200,9 +210,9 @@ export default {
                     text-overflow: ellipsis;
                     display: -webkit-box;
                     -webkit-box-orient: vertical;
-                    -webkit-line-clamp: 3;
-                    line-height: 18px;
-                    max-height: 54px;
+                    -webkit-line-clamp: 2;
+                    // line-height: 18px;
+                    // max-height: 54px;
                 }
                 .news_date{
                     font-size: 13px;

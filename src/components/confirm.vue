@@ -2,7 +2,7 @@
     <div class="my-alert" >
         <div class="alert_box">
             <p class="alert_icon"><span class="iconfont icon-fobiaozhi"></span></p>
-            <p class="alert_content"><span>确定要参与众筹吗？</span></p>
+            <p class="alert_content"><span>{{confirmMsg}}</span></p>
             <button class="alert_btn1" @click="cancelBtn">取消</button>
             <button class="alert_btn2" @click="sureBtn">确定</button>
         </div>
@@ -10,6 +10,7 @@
 </template>
 <script>
 export default {
+    props:['confirmMsg'],
      methods: {
         cancelBtn(){
             this.$emit('cancelBtn');

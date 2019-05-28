@@ -6,7 +6,7 @@ import router from './router'
 import axios from 'axios'
 import store from './store/index'
 import vueResource from 'vue-resource'
-
+import './api/appback'
 
 // axios.defaults.baseURL = "http://192.168.31.119:8003/interface.php/V1/"
 axios.defaults.headers.post['Content-Type'] = "application/json"
@@ -24,6 +24,7 @@ new Vue({
   store,
   components: { App },
   template: '<App/>',
+
 })
 
 

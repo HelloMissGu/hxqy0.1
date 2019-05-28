@@ -22,8 +22,6 @@ export default {
     .app_apy{
         background: #F3EFEB;
         height: 100%;
-        position: relative;
-        z-index: 100;
         background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;  
         display: flex;
         flex-direction: column;

@@ -29,31 +29,36 @@
 import {mapMutations} from 'vuex';
 import api from '../api/Api.js';
 import alert from './alert.vue';
-import exit from '../api/exit.js'
 export default {
   name: 'login',
    components: { 
            alert
     },
-  data () {
-    return {
-        show:false,
-        alertMsg:'',
-        errors:[],
-        phone:null,
-        pwd:null,
-        user_name:'',
-        nick_name:'',
-        email:'',
-        token:'',
-        heading:'',
-        Score:'',
-        music_url:'',
-        musicStatus:''
-    }
-  },
+    data () {
+        return {
+            show:false,
+            alertMsg:'',
+            errors:[],
+            phone:null,
+            pwd:null,
+            user_name:'',
+            nick_name:'',
+            email:'',
+            token:'',
+            heading:'',
+            Score:'',
+            music_url:'',
+            musicStatus:''
+        }
+    },
+    beforeMount() {
+        let token = localStorage.getItem('token');
+        if(token){
+            console.log(1)
+            this.$router.push('/home');
+        }
+    },
   methods:{
-     
     validMobile:function(mobile){
         var rm = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
         return rm.test(mobile);
@@ -101,15 +106,17 @@ export default {
             if(res.success == 400){
                 that.show = true;
                 that.alertMsg = res.message
-                exit();
             }
         }).catch(res => {
         })              
     },
-     closeAlert(){
+    closeAlert(){
         this.show = false;
-        if(this.alertMsg = '登录成功！'){
+        if(this.alertMsg == '登录成功！'){
             this.$router.push('/home')
+        }else if(this.alertMsg == '登录已失效，请重新登录'){
+            localStorage.clear();
+            this.$router.push('/login');
         }
     }
   }
@@ -239,6 +246,7 @@ export default {
                 border-bottom: 1px solid rgba(139, 98, 62, .6);
                 z-index: 2;
                 input{
+                    width: 80%;
                     outline-style: none;
                     border: none;
                     background-color: #e9dbbe;

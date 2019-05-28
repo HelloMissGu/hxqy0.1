@@ -1,5 +1,9 @@
 <template>
     <div class="app_donateDetail">
+        <div class="donateDetail_box">
+            <goback class="go"></goback>
+            <div class="donateDetail_name">活动详情</div>
+        </div>
         <img class="banner" :src="img_url" alt="">
         <div class="detail_title">
             <span>{{title}}</span>
@@ -76,7 +80,7 @@
                 <div class="ing_form_tip">注：每份众筹价格￥{{price}}</div>
                 <button class="donate_btn" @click="join">参与众筹</button>
             </div>
-            <confirm v-if="showConfirm" @cancelBtn="closeBtn" @sureBtn="okBtn"></confirm>
+            <confirm v-if="showConfirm" :confirm-msg="confirmMsg" @cancelBtn="closeBtn" @sureBtn="okBtn"></confirm>
             <alert v-if="showAlert" :message="alertMsg" @close-alert="closeAlert"></alert>
         </div>
         <div class="divider"></div>
@@ -131,10 +135,10 @@ import api from '../api/Api.js';
 import musicControl from './musicControl.vue';
 import confirm from './confirm.vue'
 import alert from './alert.vue'
-import exit from '../api/exit.js'
+import goback from './goback.vue';
 export default {
      components: { 
-            confirm,alert,musicControl,
+            confirm,alert,musicControl,goback,
             'remoteJs':{
                 render(createElement) {
                     return createElement('script', {attrs: {type: 'text/javascript', src: this.src}});
@@ -165,7 +169,8 @@ export default {
            showConfirm:false,
            showAlert:false,
            alertMsg:'',
-           joinNum:''
+           joinNum:'',
+           confirmMsg:''
         }
     },
     beforeMount() {
@@ -194,7 +199,6 @@ export default {
             if(res.success == 400){
                 that.showAlert = true;
                 that.alertMsg = res.message
-                exit();
             }
             // console.log(res.data)
           
@@ -216,7 +220,7 @@ export default {
             api('/interface.php/V1/Activity/moreDetail',params)
             .then(res => {
                 if(res.success == 200){
-                    console.log(res.data)
+                    // console.log(res.data)
                     that.count = res.data.count
                     that.page = res.data.page
                     that.count_num = res.data.count_num
@@ -231,7 +235,6 @@ export default {
                 if(res.success == 400){
                     that.showAlert = true;
                     that.alertMsg = res.message
-                    exit();
                 }
             })
             
@@ -261,7 +264,6 @@ export default {
                 if(res.success == 400){
                     that.showAlert = true;
                     that.alertMsg = res.message
-                    exit();
                 }
                 // console.log(res)
                
@@ -273,6 +275,7 @@ export default {
                 this.alertMsg = '请输入参与众筹份数'
             }else{
                 this.showConfirm = true
+                this.confirmMsg = '确定要参与众筹吗？'
             }
         },
         closeBtn(){
@@ -311,12 +314,15 @@ export default {
                     if(res.success == 400){
                     that.showAlert = true;
                     that.alertMsg = res.message
-                    exit();
                 }
             })
         },
         closeAlert(){
             this.showAlert = false;
+             if(this.alertMsg == '登录已失效，请重新登录'){
+                 localStorage.clear();
+                this.$router.push('/login');
+            }
         }
     },
 }
@@ -331,6 +337,49 @@ export default {
     z-index: 101;
     position: relative;
     background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
+    .donateDetail_box{
+        width: 100%;
+        display: flex;
+        padding-top: 8px;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 20px;
+        .go{
+            position: absolute;
+        }
+        .donateDetail_name{
+            color: #A41522;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            margin: 0 auto;
+            &::before,&::after{
+                background: url("../../static/assets/images/poem.png");
+            }
+            &::before{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                left: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                right: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                transform: scale(-1, 1);
+            // justify-content: center;
+                
+            }
+        }
+    }
     img{
         width: 100%;
         height: 160px;
@@ -686,6 +735,7 @@ export default {
                     align-items: center;
                     font-size: 14px;
                     color: #8B623E;
+                    margin-top: 10px;
                 }
             }
         }

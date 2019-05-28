@@ -60,7 +60,7 @@
                 <div class="temple_info">
                     <span class="iconfont icon-simiao"></span>
                     <div class="temple_name">
-                        <span>{{item.title}}</span>
+                        <span class="activity_name" style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 1;">{{item.title}}</span>
                         <span class="temple_addr">{{item.time}}</span>
                     </div>
                 </div>
@@ -68,6 +68,7 @@
             </router-link>
         </div>
         <musicControl></musicControl>
+        <navbar isSelect="imgActive" changeColor="textRed"></navbar>
     </div>
 </template>
 
@@ -75,13 +76,13 @@
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import musicControl from './musicControl.vue';
 import alert from './alert.vue';
+import navbar from './navbar.vue';
 import vueResource from 'vue-resource';
 import api from '../api/Api.js';
-import exit from '../api/exit.js'
     export default {
         name:'home', 
         components: { 
-            swiper, swiperSlide,alert,musicControl
+            swiper, swiperSlide,alert,musicControl,navbar
         },
         data(){
             return{
@@ -95,6 +96,8 @@ import exit from '../api/exit.js'
                 t_day:'',
                 templeList:[],
                 meritList:[],
+                imgActive:'',
+                textRed:'',
                 swiperOption: {
                     pagination: { el: '.swiper-pagination' }, // 分页按钮
                     autoplay: {
@@ -151,7 +154,6 @@ import exit from '../api/exit.js'
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
              })
                
@@ -167,7 +169,6 @@ import exit from '../api/exit.js'
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
              })
            
@@ -185,7 +186,6 @@ import exit from '../api/exit.js'
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
              })
     
@@ -201,7 +201,6 @@ import exit from '../api/exit.js'
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
              })
 
@@ -217,20 +216,20 @@ import exit from '../api/exit.js'
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
              })
-
-
         },
         methods: {
             showNotice(notice){
                 this.show = true;
                 this.alertMsg = notice;
-                // console.log(notice)
             },
             closeAlert(){
                 this.show = false;
+                if(this.alertMsg == '登录已失效，请重新登录'){
+                   localStorage.clear();
+                    this.$router.push('/login');
+                }
             },
             showDate(today,o_day,t_day){
                 this.show = true;
@@ -518,6 +517,16 @@ import exit from '../api/exit.js'
                 }
                 .temple_name{
                     margin-left: 10px;
+                    .activity_name{
+                        font-size: 15px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 1;
+                        line-height: 16px;
+                        height: 15px;
+                    }
                     span{
                         font-size: 15px;
                         font-weight: bold;
@@ -527,7 +536,7 @@ import exit from '../api/exit.js'
                         color: #D1C0B2;
                         font-size: 13px;
                         font-weight: normal;
-                        margin-top: 5px;
+                        margin-top: 2px;
                     }
                 }
             }

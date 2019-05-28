@@ -1,5 +1,9 @@
 <template>
     <div class="my-sign">
+        <div class="sign_box">
+            <goback class="go"></goback>
+            <div class="sign_name">签到</div>
+        </div>
         <div class="sign_info">
             <div class="info_title">
                 <div class="merit">今日签到可获得<span class="strong">{{sign_score}}</span>功德值</div>
@@ -39,11 +43,11 @@
 </template>
 <script>
 import alert from './alert.vue';
+import goback from './goback.vue';
 import musicControl from './musicControl.vue';
 import api from '../api/Api.js';
-import exit from '../api/exit.js';
 export default {
-    components:{alert,musicControl},
+    components:{alert,musicControl,goback},
     data() {
         return {
             show:false,
@@ -72,7 +76,6 @@ export default {
             if(res.success == 400){
                 that.show = true;
                 that.alertMsg = res.message
-                exit();
             }
         })
     },
@@ -95,12 +98,15 @@ export default {
                 if(res.success == 400){
                     that.show = true;
                     that.alertMsg = res.message
-                    exit();
                 }
             })
         },
         closeAlert(){
-            this.show =false;
+            this.show = false;
+            if(this.alertMsg == '登录已失效，请重新登录'){
+                localStorage.clear();
+                this.$router.push('/login');
+            }
         }
     },
 }
@@ -115,6 +121,49 @@ export default {
     position: relative;
     z-index: 1001;
     background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;
+    .sign_box{
+        width: 100%;
+        display: flex;
+        padding-top: 8px;
+        box-sizing: border-box;
+        position: relative;
+        margin-bottom: 20px;
+        .go{
+            position: absolute;
+        }
+        .sign_name{
+            color: #A41522;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            margin: 0 auto;
+            &::before,&::after{
+                background: url("../../static/assets/images/poem.png");
+            }
+            &::before{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                left: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                width: 55px;
+                height: 19px;
+                right: -60px;
+                top: 0px;
+                background-size: 55px 19px;
+                transform: scale(-1, 1);
+            // justify-content: center;
+                
+            }
+        }
+    }
     .sign_info{
         margin-top: 18px;
         width: 100%;

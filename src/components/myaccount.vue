@@ -1,7 +1,8 @@
 <template>
   <div class="app_account">
     <div class="account_box">
-      <div class="account_name">个人信息</div>
+        <goback class="go"></goback>
+        <div class="account_name">个人信息</div>
     </div>
     <div class="my_account" novalidate="true">
       <div class="account_list">
@@ -19,7 +20,8 @@
           </div>
       </div>
       <button class="log_btn" type="submit" @click="account">提交</button>
-      <alert  v-if="show" :message="alertMsg" @close-alert="closeAlert"></alert>
+      <confirm v-if="showConfirm" :confirm-msg="confirmMsg" @cancelBtn="closeBtn" @sureBtn="okBtn"></confirm>
+      <alert v-if="showAlert" :message="alertMsg" @close-alert="closeAlert"></alert>
     </div>
     <musicControl></musicControl>
   </div>
@@ -28,12 +30,13 @@
 <script>
 import api from '../api/Api.js';
 import alert from './alert.vue';
+import confirm from './confirm.vue'
 import musicControl from './musicControl.vue';
-import exit from '../api/exit.js'
+import goback from './goback.vue';
 export default {
     name: 'account',
     components: { 
-           alert,musicControl
+           alert,musicControl,confirm,goback
     },
     data () {
         return {
@@ -41,8 +44,10 @@ export default {
             nick_name:'',
             email:'',
             alertMsg:'',
-            show:false,
-            getName:''
+            showConfirm:false,
+            showAlert:false,
+            getName:'',
+            confirmMsg:''
         }
     },
   
@@ -76,10 +81,13 @@ export default {
                 this.errors.push('昵称长度不能超过6个字符');
                 return;
             }
-            if(this.nick_name && !this.email && this.validEmail(this.email)) {
-                this.errors.push('请输入邮箱');
-                return;
-            }else if(!this.validEmail(this.email)) {
+            var emailtrim = this.email.trim()
+            if(!emailtrim){
+                this.showConfirm = true;
+                this.confirmMsg = "确定不填写邮箱信息？"
+            }
+            var emailtest = this.validEmail(emailtrim)
+            if(!emailtest) {
                 this.errors.push('请输入正确的邮箱');
                 return;
             } 
@@ -92,24 +100,54 @@ export default {
             api('/interface.php/V1/User/setUserInfo',params)
             .then(res => {
                  if(res.success == 200){
-                    that.show = true;
+                    that.showAlert = true;
                     that.alertMsg = '保存成功！' 
                 }  
                 if(res.success == 300){
-                    that.show = true;
+                    that.showAlert = true;
                     that.alertMsg =  res.message
                 }
                 if(res.success == 400){
-                    that.show = true;
+                    that.showAlert = true;
                     that.alertMsg = res.message
-                    exit();
                 }   
             }).catch(res => {
             })
         },
         closeAlert(){
-            this.show = false;
+            this.showAlert = false;
             this.$router.push('/my')
+            if(this.alertMsg == '登录已失效，请重新登录'){
+                localStorage.clear();
+                this.$router.push('/login');
+            }
+        },
+        closeBtn(){
+            this.showConfirm = false;
+        },
+        okBtn(){
+             var that = this;
+            let params = {
+                nick_name:that.nick_name,
+                email:that.email,
+                token:localStorage.getItem('token')
+            }
+            api('/interface.php/V1/User/setUserInfo',params)
+            .then(res => {
+                 if(res.success == 200){
+                    that.showAlert = true;
+                    that.alertMsg = '保存成功！' 
+                }  
+                if(res.success == 300){
+                    that.showAlert = true;
+                    that.alertMsg =  res.message
+                }
+                if(res.success == 400){
+                    that.showAlert = true;
+                    that.alertMsg = res.message
+                }   
+            }).catch(res => {
+            })
         }
     }
 
@@ -125,22 +163,20 @@ export default {
     z-index: 100;
     background: #F9EEDA url("../../static/assets/images/texture.png") repeat repeat;  
     .account_box{
-        width: 100px;
-        // height: 30px;
+        width: 100%;
         display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-        padding-top: 30px;
+        padding-top: 8px;
         box-sizing: border-box;
+        position: relative;
+        .go{
+            position: absolute;
+        }
         .account_name{
-            // color: #382F30;
             color: #A41522;
             font-size: 16px;
             font-weight: bold;
             position: relative;
-            text-align: center;
-            display: inline-block;
-            margin: 0 auto 8px auto;
+            margin: 0 auto;
             &::before,&::after{
                 background: url("../../static/assets/images/poem.png");
             }
@@ -167,9 +203,8 @@ export default {
     }
     .my_account{
         width: 100%;
-        // height: 100%;
         box-sizing: border-box;
-        padding: 80px 16px 12px 16px;
+        padding: 80px 36px 12px 36px;
         display: flex;
         flex-direction: column;
         justify-content: space-around;
@@ -178,8 +213,7 @@ export default {
             width: 100%;
             border: 1px solid #8B623E;
             position: relative;
-            // box-sizing: border-box;
-            padding: 25px 5px;
+            padding: 25px 15px;
             &::before,&::after,.helper::before,.helper::after{
                 background: url("../../static/assets/images/border.png");
             }
